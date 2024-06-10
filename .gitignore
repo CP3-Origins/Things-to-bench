@@ -2,7 +2,6 @@
 .idea
 .coverage
 *.pt
-creds.txt
 STATUS.md
 .python-version
 
