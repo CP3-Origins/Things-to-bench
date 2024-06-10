@@ -5,14 +5,14 @@ from cp3-bench.bench.evaluate_dataset import evaluate_dataset
 PATH = os.path.dirname(os.path.abspath(__file__))
 
 TRAINING_DATASETS = [
-    "Koza2_1000.csv",
-    "Jin1.csv",
+    "F1.csv",
+    "F4.csv",
     "Jin4.csv",
-    "Keijzer1_1000.csv",
-    "Keijzer4_1000.csv",
-    "Vladislavleva1.csv",
-    "Korns2_N30.csv",
-    "Korns8_N30.csv",
+    "F2.F5",
+    "F3.csv",
+    "F6.csv",
+    "F7.csv",
+    "F8.csv",
 ]
 
 COSMO_DATASETS= [
