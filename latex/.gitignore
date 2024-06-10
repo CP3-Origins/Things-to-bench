@@ -1,0 +1,10 @@
+# Ignore all
+*
+
+# Except pdfs, latex classes, figs, tex, bib, .gitignore
+!figs
+!*.pdf
+!*.tex
+!*.bib
+!*.sty
+!.gitignore

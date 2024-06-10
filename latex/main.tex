@@ -1,0 +1,229 @@
+\documentclass[a4paper,11pt]{article}
+\pdfoutput=1 % if your are submitting a pdflatex (i.e. if you have
+% images in pdf, png or jpg format)
+
+\usepackage{jcappub} % for details on the use of the package, please
+% see the JCAP-author-manual
+\usepackage{graphicx,subfigure}
+
+
+\usepackage[T1]{fontenc} % if needed
+
+
+\title{Symbolic regression benchmarked for cosmology}
+
+\author{M. E. Thing and S. M. Koksbang}
+\affiliation{CP3-Origins, University of Southern Denmark, Campusvej 55, DK-5230 Odense M, Denmark}
+
+\emailAdd{thing@cp3.sdu.dk}
+\emailAdd{koksbang@cp3.sdu.dk}
+
+\keywords{}
+
+
+
+\abstract{
+TO BE REMOVED BEFORE SUBMISSION: APPROPRIATE REFEREE SUGGESTIONS: Deaglan Bartlett, William La Cava, 
+}
+\begin{document}
+	\maketitle
+	\flushbottom
+	
+\section{Introduction}
+	It is a foundational aspect of physics that we are able to use symbolic expressions to describe how the world around us works. It is therefore a significant challenge when we meet a physical system, observable or an experimental dataset that we cannot describe through mathematical formulas. This problem arises various places in astrophysics and cosmology where, for instance, the precise halo mass function is unknown \cite{halo_profile}, stellar density profiles are estimated based on various approximations but are generally unknown \cite{stellar_profile}, a derived expression for the non-linear matter power spectrum does not yet exist \cite{nonlinear_power}, and where intricacies of general relativity leave useful expressions for some observables such as the  mean redshift drift \cite{zdrift1,zdrift2} still waiting to be found (mean redshift drift will be introduced in section \ref{sec:data}).
+	
+	Fittingly, a significant number of freely available algorithms aimed at solving regression problems have been developed in the recent years. The algorithms are based on a variety of machine learning and deep learning approaches ranging from the more traditional pure genetic algorithms (such as \cite{gplearn}) to tree-based genetic programming \cite{semantic}, methods incorporating language models (e.g. \cite{language}), models relying on deep neural networks (such as \cite{Feynman1, Feynman2}), just to name a few (see e.g. \cite{review, benchmark} for reviews of symbolic regression and their different strategies and performance on standard datasets). Several of these algorithms have even been developed with physics in mind (e.g. \cite{Feynman1, Feynman2, physics_motivation}) and one motivation for the development of symbolic regression algorithms is exactly to be able to discover hitherto unknown physics formulae (noted in e.g. \cite{Feynman1, physics_motivation}). Along this vein, symbolic regression has indeed been shown to be able to identify known physical relations \cite{Feynman1, Feynman2, orbital}, been used to study Hubble data \cite{Hubble, physics_motivation} and learn about galactic dynamics \cite{sparc}, studying inflationary potentials \cite{inflation} and galaxy halos \cite{halo1, halo2}. In addition, symbolic regression has been used to attempted revealing unknown functional forms in cosmology, such as identifying an expression for the mean redshift drift and cosmic backreaction \cite{zdrift1, zdrift2}, and the non-linear matter power spectrum \cite{ps}.
+
+	In the works listed above, where symbolic regression has been used for cosmology, the approach has generally been to use one or very few specific algorithms. For instance, the work in \cite{zdrift1, zdrift2} (by one of the current authors) utilized the symbolic regression algorithms AI Feynman \cite{Feynman1, Feynman2} based on its user friendliness and because it was developed by physicists with discovering physics formulae in mind and showed an improvement compared to earlier state-of-the-art algorithms. The work presented in \cite{ps} instead utilized OPERON \cite{operon} which was chosen due to its speed, memory efficiency and because it is based on genetic algorithms which tend to do well in symbolic regression benchmark studies and competitions (e.g. \cite{benchmark, competition}). 
+
+	In general, when cosmologists choose an algorithm for symbolic regression, we naturally make a choice we expect representative of state-of-the-art for the task.  However, symbolic regression algorithms are usually evaluated and compared by studying their efficiency at identifying symbolic expressions corresponding to certain ensembles of datasets such as the Penn Machine Learning Benchmarks \cite{PMLB1, PMLB2}, collections of mathematical expressions (See e.g. the appendix A of \cite{review}) and some even use a dataset based on 100 equations from the Feynman Lectures on Physics \cite{FeynmanLectures}, the so-called Feynman Symbolic Regression Database\footnote{https://space.mit.edu/home/tegmark/
+	aifeynman.html}. Although these ensembles often do include physics datasets (not the least the Feynman Symbolic Regression Database), this does not necessarily mean that benchmarking with them result in benchmarkings that are particularly enlightening when it comes to the applicability to real cosmology symbolic regression tasks. One hindrance is that real world cosmology problems are typically based on very complex physics which means that the corresponding datasets can be difficult to obtain, understand and can end up being complicated from a physical point of view, e.g. including several dependent variables. This type of datasets simply does not seem to be represented significantly in common machine learning/symbolic regression databases.
+
+It is not clear that symbolic regression algorithms optimized with typical machine learning database problems are also optimized for real world cosmology problems. To understand whether or not this is indeed the case, we here present a benchmarking of symbolic regression algorithms based on specific cosmology datasets. While typical benchmark tasks can consist of one or several hundreds of datasets, we here restrict the benchmark to only a few datasets which are, however, genuine cosmology datasets related to and representing genuine symbolic regression tasks in cosmology.
+
+	In section \ref{sec:data} below, we introduce the datasets we used for the benchmarking, including an introduction to the cosmological settings they represent. In section \ref{sec:benchmark} we present the benchmarking setup and results while section \ref{sec:Summary} serves as a summary where we also provide a discussion of future possible developments.
+	
+	
+	
+	%Mattias: Bottom of page https://cavalab.org/srbench/user-guide/ is how to use the benchmark on own datasets. This is what we want + e.g. add some extra SR algorithms newer than 2021. Benchmark study described in 2107.14351.
+	%Possible extra ML algorithms to consider: QLattice/Feyn (python module) https://docs.abzu.ai/ (winner in competition: https://cavalab.org/srbench/competition-2022/), uDSR https://github.com/dso-org/deep-symbolic-optimization (winner in competition: https://cavalab.org/srbench/competition-2022/)
+	%PySR, ESR (hard to install),  EQL, FFX (https://github.com/natekupp/ffx/tree/master), ITEA (https://github.com/folivetti/ITEA/), symbolic regression with transformers 2204.10532
+	
+	 %% SHOULD ABSOLUTELY TRY TO INCLUDE PhySO: https://github.com/WassimTenachi/PhySO (related paper: 2303.03192)
+
+
+\section{Data}\label{sec:data}
+This section serves to describe the data used for the benchmarking. In the first subsection below, we introduce the redshift-distance relation used in standard cosmology. The subsequent subsection is dedicated to the observable known as redshift drift and its Friedmann-Lemaitre-Robertson-Walker (FLRW) limit. In the final two subsections we introduce a specific family of toy cosmological models called two-region models and discuss how to compute the redshift drift as well as a quantity known as cosmic backreaction in these models.
+	
+\subsection{Redshift-distance relation in standard cosmology}
+Earlier work has included showcasing the use of new symbolic regression algorithms for astrophysics by applying them to supernovae data (e.g. \cite{physics_motivation, Hubble}). Supernova data is one of the most important data sets in cosmology and is the closest to direct evidence for accelerated expansion of the Universe currently available. For our benchmark, we do not wish to use real data where the ground truth of the corresponding symbolic expression is unknown. In order to understand the significance of the showcase in \cite{physics_motivation, Hubble} we will, however, include a mock supernova dataset as our first benchmark dataset.
+
+Standard cosmology is based on the Friedman-Lemaitre-Robertson-Walker (FLRW) spacetimes, where the redshift-distance relation can be written as
+\begin{align}
+	D_L(z) = \frac{1+z}{\sqrt{K/R_0^2}}\sin\left(\sqrt{K/R_0^2}c \int_0^z\frac{dz'}{H(z')} \right) ,
+\end{align}
+where $K=\pm1,0$ is the sign of the curvature and $R_0$ is the curvature radius of the model. In $\Lambda$CDM models we can write the Hubble parameter, $H(z)$, as
+\begin{align}
+	H(z)^2 = \frac{\Omega_{m,0}}{a^3} + (1-\Omega_{m,0}).
+\end{align}
+%Note to Mattias regarding relating this work to dark matter/dak renergy: The supernova observations from 1997-1998 are the observations that made the LCDM model the standar model, .e. it's because of the supernova observations we have dark energy in our standar dmodel og cosmology.
+Supernovae data is usually presented in terms of the distance modulus, $\mu$, and we therefore covert the luminosity distance, $D_L$, to $\mu$ according to
+\begin{align}
+	\mu = 5\log_{10}\left( \frac{D_L}{1Mpc}\right) +25.
+\end{align}
+We include 2 datasets based on the distance modulus in our benchmark. Following \cite{physics_motivation, Hubble} we will consider flat $\Lambda$CDM models only. Using this set of models, we generate 3 datasets. First, we generate two datasets meant to mimic real supernovae datasets by specifying a single model with $H_0 = 70$km/s/Mpc and $\Omega_{m,0}=0.3$. One dataset will consist of $(\mu, z)$ without noise while the second dataset will contain 10\% Gaussian noise on $\mu$. For each dataset, we compute 1000 data points distributed equidistantly in the redshift interval $z\in[0,2]$, roughly representing the redshift interval of real supernova datasets. We will also consider a more complicated dataset, where we let $H_0$ and $\Omega_{m,0}$ vary. We thus generate datasets of the form $(\mu, z, H_0, \Omega_{m,0})$ where we let $H_0\in[20,100]$ in units of km/s/Mpc and $\Omega\in[0.1,0.5]$. Again, we use equidistant points, now with 100 points for each feature. This dataset, as well as those discussed in the following subsections, are motivated by the ambition to decipher which symbolic regression methods are most suitable for discovering hitherto unknown observational relations. Our rationale is that observational relations must be valid for more than a single set of model parameters i.e. not just for a single $\Lambda$CDM model but rather for, e.g., \emph{all} FLRW models. We therefore wish to test symbolic regression methods on how well they can describe data representing one or more families of cosmological models such as sub-families of FLRW models rather than just a single FLRW model. Since this type of dataset will be inherently more complicated than datasets with only a single feature, we will not add noise to these datasets.
+
+
+\subsection{Redshift drift in standard cosmology}
+One of the biggest mysteries in cosmology is the physical nature of dark energy i.e. the source of accelerated expansion of the Universe \cite{DEreview}. The apparent accelerated expansion of the universe has, however, never been measured directly. The observable \emph{redshift drift} represents a possibility to remedy this. The redshift of a luminous astronomical object changes with time. Since the change is slow, it has been dubbed the redshift \emph{drift}. Redshift drift was first discussed in \cite{Sandage, Mcvittie} from 1962 but it was there assessed that the effect was too small to be measureable. Due to technological advances, it is presently expected that the effect can be measured with e.g. the Square Kilometer Array (SKA)\cite{SKA}. In standard cosmology, the redshift drift $\delta z$ can be written as
+	\begin{align}
+	    \delta z = \delta t_0[(1+z)H_0 - H(z) ],
+	\end{align}
+	where $H(z)$ is the Hubbel parameter, $H_0$ the Hubble constant and $\delta t_0$ is the time interval of the observation such that an object observed to have redshift $z$ at time $t_0$ will be observed to have the redshift $z+\delta z$ at time $t_0 + \delta t_0$.
+	
+	The expression for the redshift written above is fairly simple. Nonetheless, it represents an interesting symbolic regression problem because the right hand side of the equation contains a feature $H(z)$ which depends on one of the other features ($z$) in a non-trivial way. Earlier studies into machine and deep learning algorithms have included datasets where two or more variables were dependent, these dependencies are typically linear or otherwise simple (see e.g. \cite{BIMT} for an example). However, to the authors' knowledge, there have not been conducted systematic studies of this and there has not been conducted studies considering datasets where features have more complicated dependencies such as in the case of the Hubble parameter and its dependence on the redshift. In cosmology, observable relations are often more convenient to consider in terms of several dependent features though. Besides the redshift drift, this is for instance the case for redshift-distance relations which are usually written as an integral over the Hubble parameter in terms of the redshift multiplied by factors containing the redshift itself as well. In our benchmarking dataset we will therefore include the redshift drift as written above, i.e. with the target being $\delta z/\delta t_0$ and the features being $z$ and $H(z)$. However, we will consider only flat, single-component FLRW models when generating the datasets. In this case, a simple rewriting gives that the redshift drift can be written as
+	\begin{align}
+	    \delta z = \delta t_0 H_0[(1+z) - (1+z)^{3(1+\omega)/2}],
+	\end{align}
+	where $\omega$ is the equation-of-state parameter for the single component of the content of the model universe.
+
+	Using the formalism discussed above, we have generated two redshift drift datasets, $(\delta z/\delta t_0, z, H(z))$ and $(\delta z/\delta t_0, z, \omega)$. The two models contain the same number of features, has the same target and contains the same number of data points generated using 50 equidistant points in each of the two intervals $z\in[0.1,1]$ and $\omega\in[-0.99,1/3]$. When choosing the redshift interval, we deliberately avoid the very lowest redshifts to avoid a target very close to zero. We choose the upper limit $z = 1$ since this is the upper limit expected for main redshift drift measurements from SKA \cite{SKA}. For $\omega$ we choose the upper limit of $1/3$ which corresponds to the equation-of-state parameter for radiation while we choose a lower limit close to that of a cosmological constant, although neglecting the value $-1$ to keep the overall form of the Hubble parameter the same for all models\footnote{Remember that for flat, single component universes, $H(z) = \frac{2}{3(1+\omega)t}$ except for the case $\omega = -1$ where the Hubble parameter is constant.}.
+
+\subsection{Cosmic backreaction and two-region models}
+	The expression for the redshift drift given in the previous section is valid only for FLRW spacetimes, i.e. in spacetimes which have no structures on any scales. Standard cosmology is based on the assumption that the large-scale dynamics of the Universe can be approximated well by the FLRW models but it has also been discussed whether the structures on smaller scales can affect the large-scale/averaged dynamics. This possibility is known as cosmic backreaction \cite{bc_review1, bc_review2, bc_review3, bc_review4} and it has even been suggested that the seemingly accelerated expansion of the Universe is an artifact due to this phenomenon (the co-called backreaction conjecture -- see e.g. \cite{conjecture1, conjecture2, conjecture3, conjecture4}). Backreaction and the backreaction conjecture are most commonly considered through the Buchert equations presented in \cite{dust, perfect_fluid, general} where dynamical equations describing the average (large-scale) evolution of the Universe are obtained by averaging Raychaudhuri's equation and the Hamiltonian constraint using the averaging definition
+	\begin{align}
+	    s_D:=\frac{\int_D sdV}{\int_D dV},
+	\end{align}
+	where $s$ is some scalar, $dV$ the proper infinitesimal volume element on the spatial domain $D$ assumed to be larger than the homogeneity scale. This definition can be used when considering spacetimes foliated with spatial hypersurfaces orthogonal to the fluid flow (possible for irrotational fluids such as dust) and where the line element is written as
+	\begin{align}
+	    ds^2 = -dt^2 + g_{ij}dx^idx^j.
+	\end{align}
+	The resulting averaged Hamiltonian constraint and Raychaudhuri equation can be written as (setting $c=1$)
+	\begin{align}\label{eq:Buchert_av}
+	\begin{split}
+	    3H_D^2 &= 8\pi G\rho_D - \frac{1}{2}R_D - \frac{1}{2}Q_D\\
+	    3\frac{\ddot a_D}{a_D} &= -4\pi G\rho_D + Q_D.
+	\end{split}
+	\end{align}
+	$H_D:=\dot a_D/a_D$ denotes the average Hubble parameter and is related to the local fluid expansion scalar $\theta$ by $H_D=\theta_D/3$. The volume/averaged scale factor $a_D$ is unlike the scale factor in FLRW spacetimes not related to the metric (which is not considered in the Buchert averaging scheme) but is instead defined as $a_D:=(V_D/V_{D_0})^{1/3}$, where $V_D$ is the proper volume of the spatial domain $D$ and subscripts zero indicate evaluation at present time.
+	
+	The dynamical equations for the average universe shown above are reminiscent of the Friedmann equation and acceleration equation but contain an extra term, namely $Q_D:=2/3\left[  (\theta^2)_D - (\theta_D ^2)\right]  - \left( \sigma_{\mu\nu}\sigma^{\mu\nu}\right) _D$, where $\sigma_{\mu\nu}$ is the shear tensor of the fluid. In addition, the curvature term $R_D$ can deviate from the FLRW behavior where the curvature must be proportional to the inverse of the squared scale factor. $Q_D$ is sometimes referred to as the kinematical backreaction while the deviation of $R_D$ from having FLRW evolution is referred to as intrinsic backreaction. Combined, these two differences compared to the FLRW models mean that the large-scale dynamics of an inhomogeneous universe does not necessarily follow FLRW dynamics even when averaging above the homogeneity scale.
+
+	The two backreaction terms are coupled through the integrability condition
+	\begin{align}
+	    a_D^{-6}\partial_t(a_D^6Q_D) + a_D^{-2}\partial_t(a_D^2R_D) = 0.
+	\end{align}
+	This equation ensures that the two Buchert equations are in accordance with each other. However, the two Buchert equations and the integrability condition do not form a closed set so cannot be used to predict backreaction, not even qualitatively. Therefore, it is not known how backreaction e.g. can be parameterized in terms of the scale factor (or equivalently, the mean redshift $<z>+1\approx 1/a_D$ \cite{light1, light2}). As discussed in e.g. \cite{zdrift1,zdrift2}, this means that backreaction cannot be sensibly constrained with current cosmological data. This motivated an attempt (presented in \cite{zdrift1,zdrift2}) to obtain parameterizations for backreaction using toy cosmological models where backreaction can be computed, combined with symbolic regression to identify symbolic expression for backreaction. That study is extended here, where several datasets based on the so-called two-region models introduced in \cite{2region1, 2region2} will be used in the benchmarking.
+	\newline\newline
+	Two-region models are toy-cosmological models consisting of an ensemble of two different FLRW models. Since the ensemble is disjoint, the model is not an exact solution to Einstein's equation. The model is nonetheless convenient to use for studying backreaction because the model is numerically fast and simple to work with. Following the procedure in \cite{2region1, 2region2} we will consider a two-region model where one model is the empty (Milne) solution while the other region is an overdense (density larger than the critical density) matter+curvature model. In this case, the scale factors, $a_o$ and $a_u$, of the two regions can be related by a common time coordinate, $t$, by using a parameter, $\phi$ (sometimes denoted the development angle), according to
+	\begin{align}
+	\begin{split}
+	    t &= t_0\frac{\phi - \sin(\phi)}{\phi_0 - \sin(\phi_0)}\\
+	    a_u & = \frac{f_u^{1/3}}{\pi}(\phi - sin(\phi))\\
+	    a_o & = \frac{f_o^{1/3}}{\pi}(1-\cos(\phi) ).
+	\end{split}
+	\end{align}
+	The parameters $f_u$ and $f_o$ denote the present time relative volume fractions of the two regions in the ensemble and are related by $f_u = 1-f_o$. As in \cite{2region1,2region2}, present time is defined to correspond to $\phi_0 = 3/2\pi$. As noted in e.g. \cite{zdrift2}, once $f_u$ or $f_o$ has been fixed, there is still one parameter which needs to be set in order to specify a two-region model uniquely. This is seen by noting that $H_D = H_u(1-v + vh)$, where is the time dependent volume fraction of the overdense region and $h:=H_o/H_u$. Since $H_u=1/t$ we therefore have $t_0=(1-v_0+v_0h_0)/H_{D_0}$ and thus need to fix either $t_0$ or $H_{D_0}$. We will choose $H_{D_0} = 70$km/s/Mpc.
+	\newline\newline
+	Since both $Q_D$ and $R_D$ have unknown parameterizations in terms of $a_D$, we have used two two-region datasets for the benchmarking, namely $(Q_D, z, \Omega_{m,0}, \Omega_{R,0}, \Omega_{Q,0})$ and $(R_D, z, \Omega_{m,0}, \Omega_{R,0}, \Omega_{Q,0})$, where we have defined $\Omega_{m,0}:=8\pi/(3H_{D_0}^2)\rho_{D,0}$, $\Omega_{R,0}:=-R_{D,0}/(6H_{D,0}^2)$ and $\Omega_{Q,0}:=-Q_{D,0}/(6H_{D,0}^2)$. Based on the findings in \cite{zdrift1,zdrift2}, the data points were generated using equidistant points in the intervals $z\in[0,1]$ and $f_o\in[0.1,0.25]$.
+	\newline\newline
+	Since a ground truth for the symbolic expression for $Q_D$ and $R_D$ in terms of the features in the datasets are unknown, we asses the success of the symbolic regression algorithms by 1) evaluating their precision on the training model subspace, and 2) evaluating their precision on data generated outside the model subspace used for training. Specifically, we will consider models in the larger interval $z\in[0,5]$ and $f_o\in[0.05, 0.3]$.
+	\newline\newline
+	As detailed in \cite{2region1,2region2}, the averaged deceleration parameter $q_D$ can be written as
+	\begin{align}
+	\begin{split}
+	    q_D := -\frac{1}{H_D^2}\frac{\ddot a_D}{a_D}& = q_u\frac{1-v}{(1-v+hv)^2} + q_o\frac{vh^2}{(1-v+hv)^2} - 2\frac{v(1-v)(1-h)^2}{(1-v+hv)^2}\\
+	    & = q_o\frac{vh^2}{(1-v+hv)^2} - 2\frac{v(1-v)(1-h)^2}{(1-v+hv)^2},
+	\end{split}
+	\end{align}
+	where the second line comes from the empty region being coasting and hence $q_u = 0$. The last term is the backreaction term due to $Q_D$. By comparing with the equations \ref{eq:Buchert_av} we see that we can write $Q_D$ as e.g. 
+	\begin{align}
+		\begin{split}
+		Q_D & = 6H_D^2\frac{v(1-v)(1-h)^2}{(1-v+hv)^2}\\
+		&= -6\left( \frac{\ddot a_D}{a_D} + \frac{1}{2a_D^3}H_{D_0}^2\Omega_{m,0}\right). 
+		\end{split}
+	\end{align}
+The above two expressions are fairly straight forward analytical expressions. However, both expressions contain several dependent variables since $v, h, H_D, \ddot a_D$ and $a_D$ all depend on time (differently) which may make the regression task more complicated. We will therefore include $\left(Q_D, H_D, v, h \right) $ and $\left( Q_D, H_{D_0}, \Omega_{m,0}, a_D, \ddot a_D \right) $ as datasets used for the benchmarking to complement the earlier datasets for the target $Q_D$ where there is no known ground truth expression.
+
+
+	\subsubsection{Redshift drift in 2-region models}
+		The redshift drift is a particularly interesting observable in relation to backreaction and the backreaction conjecture because it can be used as a smoking gun for distinguishing between accelerated expansion due to dark energy versus backreaction \cite{smokinggun1, smokinggun2, smokinggun3, smokinggun4}. The foundation for the smoking gun signal is that the mean redshift drift is not in general equal to the drift of the mean redshift in an inhomogeneous spacetime even if that spacetime is statistically homogeneous (where ``mean'' observations here indicate observations after taking the mean over many lines of sight in order to remove statistical fluctuations). Mathematically, we can write this statement as
+		\begin{align}
+		    <\delta z>\neq \delta <z> = \delta t_0[(1+<z>)H_{D,0}-H_D(<z>)],
+		\end{align}
+		where we set $<z> +1  =1/a_D$. As discussed in \cite{zdrift1,zdrift2}, an expression for $<z>$ in inhomogeneous cosmological models exhibiting backreaction is unknown. The redshift drift can nonetheless be computed in concrete cosmological models exhibiting backreaction as was done in \cite{smokinggun1,smokinggun2}, with the former utilizing two-region models.
+
+		The procedure for computing the redshift drift in two-region models is to arrange copies of the two FLRW regions consecutively after one another along a light ray propagated according to the equations
+		\begin{align}
+			\frac{dt}{dr} &= -a\\
+			\frac{dz}{dr}& = (1+z)\dot a\\
+			\frac{d\delta z}{dr} &= \dot a\delta z + (1+z)\ddot a\delta t\\
+			\frac{d\delta t}{dr} &=-\dot a	\delta t,
+		\end{align}
+		where scale factors are evaluated according to the local model the light ray is in at a given time.
+		\newline\newline
+		By solving the above equations, we generate datasets of the form $(<\delta z>/\delta t_0, <z>, \Omega_{m,0}, \Omega_{R,0}, \Omega_{Q,0})$,  $(<\delta z>/\delta t_0, <z>, H_D(<z>),\Omega_{m,0}, \Omega_{R,0}, \Omega_{Q,0})$ and $((<\delta z> - \delta <z>)/\delta t_0, <z>, \Omega_{m,0}, \Omega_{R,0}, \Omega_{Q,0})$, where the two latter datasets are inspired by the fact that we know the symbolic expression for the FLRW redshift drift requires either an equation of state parameter or Hubble parameter. The datasets were generated using 50 equidistant points of $f_o\in[0.1,0.25]$ and X values of the redshift in the interval $z\in[0.1,1]$. 
+		\newline\newline
+		As with the earlier two-region model datasets, we will assess the quality of the symbolic expressions obtained by the regression algorithms by seeing how well they generalized outside the model subspace the algorithms were trained on.
+
+\section{Benchmarking}\label{sec:benchmark}
+We need some overall considerations regarding symbolic regression here, evt. med udgangspunkt i de algortimer vi tester med highlight af, hvordan de adskiller sig fra hinanden.
+
+\subsection{Benchmarking method}
+
+\subsection{Benchmarking results}
+Remember to comment on units in final expressions. E.g. \cite{physics_motivation} claim that symbolic expressions are nonesensical from a physical point of view if the units do not match and therefore introduce a ``unit'' prior in their symbolic regression algorithm. But that is too strong a claim because units can be ``hidden'' in the prefactors. NOTE: WE COULD EVEN TRY TO RE-CAST PREFACTORS IN TERMS OF c, G and pi OF SYMBOLIC EXPRESSIONS IF ANY SEEM REPRESENATIVE OF A GROUND TRUTH.
+
+
+%\begin{figure*}
+%	\centering
+%	\subfigure[]{
+%		\includegraphics[scale = 0.5]{SRmodel1.pdf}
+%	}
+%	\subfigure[]{
+%		\includegraphics[scale = 0.5]{SRmodel2.pdf}
+%	}\par
+%	\subfigure[]{
+%		\includegraphics[scale = 0.5]{SRmodel3.pdf}
+%	}
+%	\subfigure[]{
+%		\includegraphics[scale = 0.5]{SRmodel4.pdf}
+%	}
+%	\caption{Symbolic expressions for $(a_D,Q)$ and $(z,Q)$ found by AI Feynman plotted together with data points. If legends indicate a function in terms of $z$, the expression was obtained by presenting AI Feynman with data of the form $(z,Q)$, and equivalently for $a_D$.}
+%	\label{fig:FirstFit}
+%\end{figure*}
+
+
+\section{Summary and conclusions}\label{sec:Summary}
+	E.g. discuss something about machine learning not aimed at precision: 2210.13447. Also discuss that simplicity is often optimised in SR algorithms which is sensible from a physical perspective because physical laws generally are not very complex. But at the same time, note that the complexity is no hindrance for utilising expressions for e.g. parameter determination (2307.16468). Therefore, it may be that better machine learning algorithms for cosmology can be achieved by being less strict about reducing complexity of symbolic expressions.
+
+	Comment on whether your benchmarking shows a significant difference in which models are best/worst compared to the original benchmarking of 2107.14351.
+
+
+
+
+	
+	\vspace{6pt} 
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{acknowledgments}
+	We thank the authors of \cite{benchmark} and in particular Fabrício Olivetti de França and William La Cava for correspondence.
+	
+	SMK is funded by VILLUM FONDEN, grant VIL53032. Part of the numerical work done for this project was performed using the UCloud interactive HPC system managed by the eScience Center at the University of Southern Denmark.
+	\newline\newline
+	{\bf Author contribution statement}:
+\end{acknowledgments}
+	
+	
+%	\appendix
+	
+	
+%	\section{...}
+
+% -------------------------------------------------------------------
+% Bibliography
+% -------------------------------------------------------------------
+\bibliographystyle{ieeetr} % We choose the "plain" reference style
+\bibliography{main} % Entries are in the main.bib file
+
+\end{document}
+
