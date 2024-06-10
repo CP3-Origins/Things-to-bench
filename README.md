@@ -1,43 +1,58 @@
-# SR-benchmark
+# Things to bench
+
+This is repository shows an example of how one can work with the symbolic regression benchmark `cp3-bench`.
+Furthermore, one can find our results related to our paper: MISSING
+
 Benchmarking symbolic regression algorithms using cosmological data (Sofie og Mattias)
 
 
-## srbench
+## Getting started
 
-Go to the python folder for installation instructions.
+To try out this repository clone it with recursion:
+```bash
+git clone https://github.com/CP3-Origins/Things-to-bench.git --recursive
+```
+
+To run the benchmark go to the cp3-bench folder for installation instructions.
 
 
-## Notes on dataset
-Koza2 with data range [-1,1,20]
+## Notes on test datasets
+Here you can see specifications of the test dataset found in `datasets`.
 
-return x**5 - 2*x**3 + x
+F1 with data range x=[-10,1] N=1000
 
-Keijzer1 with data range [-1,1,20]
+Function: $x^5 - 2*x^3 + x$
 
-return 0.3*x*np.sin(2*np.pi*x)
+F2 with data range x=[-10,10] N=1000
 
-Keijzer4 with data range [0,10,20]
+Function: $0.3*x*\sin(2*\pi*x)$
 
-return x**3*np.exp(-x)*np.cos(x)*np.sin(x)*( np.sin(x)**2*np.cos(x) -1 )
+F3 with data range x=[0,10] N=1000
 
-Jin1 in interval [-3,3, N = 100]
+Function: $x^3*np.exp(-x)*\cos(x)*\sin(x)*(\sin(x)^2*\cos(x)-1)$
 
-return 2.5*x**4 - 1.3*x**3 + 0.5*y**2 - 1.7*y
+F4 in interval x,y=[-3,3] N=100
 
-Jin4 in interval [-3,3, N = 100]
+Function: $2.5*x^4 - 1.3*x^3 + 0.5*y^2 - 1.7*y$
 
-return 1.5*np.exp(x) + 5.0*np.cos(y)
+F5 in interval x,y=[-3,3] N=100
 
-Vladislavleva1 in interval [0.3,4, N = 100]
+Function: $1.5*e^x + 5.0*\cos(y)$
 
-return np.exp(-(x-1)**2)/( 1.2+(y-2.5)**2 )
+F6 in interval x,y=[0.3,4] N=100
 
-Korns2 in interval [-5,5,N = 50]
+Function: $e^{-(x-1)^2}/( 1.2+(y-2.5)^2)$
 
-return 0.23+14.2*(xx1 + xx2)/(3*xx3)
+F7 in interval x,y,z=[-5,5] N=30
 
-Korns8 in interval [0,10, N = 50]
+Function: $0.23+14.2*(x + y)/(3*z)$
 
-#return 6.78+11*np.sqrt(7.23*xx1*xx2*xx3) 
+F8 in interval x,y,z=[-5,5] N=30
 
-Jeg har navngivet og (stortset) valgt intervaller ud fra tabel 7-9 i https://arxiv.org/pdf/2211.10873.pdf
+Function: $6.78+11*\sqrt{7.23*x*y*z}$
+
+These equation are inspired by: https://arxiv.org/pdf/2211.10873.pdf
+
+## Citing this work
+
+If you find `cp3-bench` and this example useful, please cite:
