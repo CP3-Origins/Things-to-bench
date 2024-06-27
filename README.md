@@ -1,6 +1,6 @@
 # Things to bench
 
-This is repository shows an example of how one can work with the symbolic regression benchmark `cp3-bench`.
+This repository shows an example of how one can work with the symbolic regression benchmark `cp3-bench`.
 Furthermore, one can find our results related to our [paper](https://arxiv.org/abs/2406.15531).
 
 Benchmarking symbolic regression algorithms using cosmological data.
