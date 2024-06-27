@@ -1,10 +1,14 @@
 # Things to bench
 
 This is repository shows an example of how one can work with the symbolic regression benchmark `cp3-bench`.
-Furthermore, one can find our results related to our paper: MISSING
+Furthermore, one can find our results related to our [paper](https://arxiv.org/abs/2406.15531).
 
-Benchmarking symbolic regression algorithms using cosmological data (Sofie og Mattias)
+Benchmarking symbolic regression algorithms using cosmological data.
 
+The authors of this paper would like to close by stating that we are open to cooperation in regards to develop the 
+framework of cp3-bench further, including adding more algorithms to the suite, but also adding new features and 
+improving compatibility to other platforms. 
+We suggest contacting the authors per e-mail and code contributions done via pull requests.
 
 ## Getting started
 
@@ -56,3 +60,15 @@ These equation are inspired by: https://arxiv.org/pdf/2211.10873.pdf
 ## Citing this work
 
 If you find `cp3-bench` and this example useful, please cite:
+
+```
+@misc{thing2024cp3bench,
+      title={cp3-bench: A tool for benchmarking symbolic regression algorithms tested with cosmology}, 
+      author={Mattias E. Thing and Sofie M. Koksbang},
+      year={2024},
+      eprint={2406.15531},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.IM},
+      url={https://arxiv.org/abs/2406.15531}, 
+}
+```
