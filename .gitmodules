@@ -1,3 +1,3 @@
 [submodule "cp3-bench"]
-	path = cp3-bench
+	path = cp3bench
 	url = https://github.com/CP3-Origins/cp3-bench.git
