@@ -1,6 +1,6 @@
 import os
 import logging
-from cp3-bench.bench.evaluate_dataset import evaluate_dataset
+from cp3bench.bench.evaluate_dataset import evaluate_dataset
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 
