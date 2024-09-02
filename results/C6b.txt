@@ -1,0 +1,2 @@
+method,mse,equation,run_time
+AI-Feynman,0.174357171287842,-1.357972526879+(cos(sin(exp((pi-(x0)**(-1))))))**(-1),08:53:25
