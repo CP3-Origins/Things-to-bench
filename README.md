@@ -29,11 +29,11 @@ Function: $x^5 - 2*x^3 + x$
 
 F2 with data range x=[-10,10] N=1000
 
-Function: $0.3*x*\sin(2*\pi*x)$
+Function: $0.3*x*sin(2*\pi*x)$
 
 F3 with data range x=[0,10] N=1000
 
-Function: $x^3*np.exp(-x)*\cos(x)*\sin(x)*(\sin(x)^2*\cos(x)-1)$
+Function: $x^3*exp(-x)*cos(x)*sin(x)*(sin(x)^2*cos(x)-1)$
 
 F4 in interval x,y=[-3,3] N=100
 
@@ -41,7 +41,7 @@ Function: $2.5*x^4 - 1.3*x^3 + 0.5*y^2 - 1.7*y$
 
 F5 in interval x,y=[-3,3] N=100
 
-Function: $1.5*e^x + 5.0*\cos(y)$
+Function: $1.5*e^x + 5.0*cos(y)$
 
 F6 in interval x,y=[0.3,4] N=100
 
@@ -53,7 +53,7 @@ Function: $0.23+14.2*(x + y)/(3*z)$
 
 F8 in interval x,y,z=[-5,5] N=30
 
-Function: $6.78+11*\sqrt{7.23*x*y*z}$
+Function: $6.78+11*sqrt(7.23*x*y*z)$
 
 These equation are inspired by: https://arxiv.org/pdf/2211.10873.pdf
 
